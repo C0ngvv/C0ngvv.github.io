@@ -1,0 +1,856 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/64.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="C0ngvv">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="论文：Fuzzing Embedded Systems Using Debug Interfaces信息发布于2023 ISSTA 论文地址：Fuzzing Embedded Systems using Debug Interfaces (acm.org) 题目：使用调试接口模糊化嵌入式系统  摘要对嵌入式系统进行模糊测试是困难的。它们的关键组件——微控制器——是高度多样化的，不容易虚拟化;他们的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="论文：Fuzzing Embedded Systems Using Debug Interfaces">
+<meta property="og:url" content="http://c0ngvv.github.io/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/index.html">
+<meta property="og:site_name" content="C0ngvv&#39;s Blog">
+<meta property="og:description" content="论文：Fuzzing Embedded Systems Using Debug Interfaces信息发布于2023 ISSTA 论文地址：Fuzzing Embedded Systems using Debug Interfaces (acm.org) 题目：使用调试接口模糊化嵌入式系统  摘要对嵌入式系统进行模糊测试是困难的。它们的关键组件——微控制器——是高度多样化的，不容易虚拟化;他们的">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://c0ngvv.github.io/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231127144025910.png">
+<meta property="og:image" content="http://c0ngvv.github.io/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231127150817020.png">
+<meta property="og:image" content="http://c0ngvv.github.io/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231127150916538.png">
+<meta property="og:image" content="http://c0ngvv.github.io/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231127151507843.png">
+<meta property="og:image" content="http://c0ngvv.github.io/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231127150916538.png">
+<meta property="og:image" content="http://c0ngvv.github.io/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231127205108210.png">
+<meta property="og:image" content="http://c0ngvv.github.io/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231127205118738.png">
+<meta property="og:image" content="http://c0ngvv.github.io/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231127151507843.png">
+<meta property="og:image" content="http://c0ngvv.github.io/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231128085643321.png">
+<meta property="og:image" content="http://c0ngvv.github.io/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231128090947291.png">
+<meta property="og:image" content="http://c0ngvv.github.io/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231128091927330.png">
+<meta property="og:image" content="http://c0ngvv.github.io/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231128092504692.png">
+<meta property="og:image" content="http://c0ngvv.github.io/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231128093009402.png">
+<meta property="og:image" content="http://c0ngvv.github.io/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231128093341585.png">
+<meta property="article:published_time" content="2023-11-26T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-11-28T01:55:02.327Z">
+<meta property="article:author" content="C0ngvv">
+<meta property="article:tag" content="论文翻译">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://c0ngvv.github.io/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231127144025910.png">
+  
+  
+  
+  <title>论文：Fuzzing Embedded Systems Using Debug Interfaces - C0ngvv&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"c0ngvv.github.io","root":"/","version":"1.9.5-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>C0ngvv</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="论文：Fuzzing Embedded Systems Using Debug Interfaces"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-11-27 00:00" pubdate>
+          2023年11月27日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          16k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          137 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">论文：Fuzzing Embedded Systems Using Debug Interfaces</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="论文：Fuzzing-Embedded-Systems-Using-Debug-Interfaces"><a href="#论文：Fuzzing-Embedded-Systems-Using-Debug-Interfaces" class="headerlink" title="论文：Fuzzing Embedded Systems Using Debug Interfaces"></a>论文：Fuzzing Embedded Systems Using Debug Interfaces</h1><h2 id="信息"><a href="#信息" class="headerlink" title="信息"></a>信息</h2><p>发布于2023 ISSTA</p>
+<p>论文地址：<a target="_blank" rel="noopener" href="https://dl.acm.org/doi/pdf/10.1145/3597926.3598115">Fuzzing Embedded Systems using Debug Interfaces (acm.org)</a></p>
+<p>题目：使用调试接口模糊化嵌入式系统</p>
+<p><img src="/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231127144025910.png" srcset="/img/loading.gif" lazyload></p>
+<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>对嵌入式系统进行模糊测试是困难的。它们的关键组件——微控制器——是高度多样化的，不容易虚拟化;他们的软件不能被更改或检测。然而，我们观察到，许多(如果不是大多数的话)微控制器都具有调试接口，调试探针(通常通过GNU调试器GDB进行控制)可以通过该接口设置有限数量的硬件断点。使用这些，我们提取部分覆盖反馈，甚至对于未插桩的二进制代码;从而能够通过通用的、广泛的机制对嵌入式系统进行有效的模糊测试。在四种不同的微控制器板上进行评估时，我们的原型实现GDBFuzz快速达到高代码覆盖率并检测已知和新的漏洞。因为它可以应用于GDB可以调试的任何程序和系统，所以GDBFuzz是要求最低和最通用的覆盖引导的fuzzers之一。</p>
+<p>关键字：嵌入式系统；固件；安全；自动化软件测试；模糊测试；GDB</p>
+<h2 id="1-引言"><a href="#1-引言" class="headerlink" title="1.引言"></a>1.引言</h2><p>模糊测试——生成大量输入来测试系统的健壮性——已经成为检测程序漏洞的首选方法。大多数现代模糊器都遵循AFL模糊模型[36]，从一群种子输入开始，在被测系统或软件的覆盖范围的指导下，通过小规模的突变不断进化。然而，将这种模糊器应用于嵌入式系统是很困难的。原因之一是微处理器、体系结构和操作系统的高度多样性。然而，最重要的是，微控制器板上的软件不容易更改，从而阻止插桩。即使可以进行插桩，板子也需要提供存储空间来捕获覆盖率和其他运行时信息;最后，这些信息需要通过某些硬件接口找到返回模糊器的方法[7]。因此，在硬件上设置常见的fuzzers(如AFL)需要为每个电路板实现单独的覆盖收集解决方案。</p>
+<p>因此，最近发表的嵌入式模糊测试方法中有很大一部分是虚拟化嵌入式系统的[15,59]。然而，这种虚拟化需要在速度和保真度之间进行权衡[17,58]。更糟糕的是，它不仅需要对微处理器本身进行虚拟化，还需要对电路板上的所有其他硬件组件进行虚拟化，并对它们之间的通信方式进行虚拟化。考虑到可用硬件外围设备的巨大多样性[26]，这需要相当大的安装成本，如果可能的话[17,58]。所谓的外设建模方法[18]试图自动模拟外设，但在我们的经验中，对于串行端口以外的任何接口都失败了。</p>
+<p>在本文中，我们提出了一种替代方法来对嵌入式系统进行模糊测试，不需要虚拟化，但使用一种适用于各种嵌入式系统的统一方法。大多数微控制器都包含调试单元，通过调试单元，调试探针可以设置断点，执行程序直到断点，并检查当前程序状态，包括程序计数器和内存值。硬件断点是调试单元中的专用寄存器，当程序计数器等于寄存器值时，它停止执行，即使代码是只读的也可以设置;它们既不改变也不降低程序代码的速度。</p>
+<p>本文的关键思想是，通过基于程序的控制流图系统地在代码中设置断点，并通过检查哪些输入触发哪些断点，我们可以检索覆盖率信息，从而为反馈驱动的模糊测试策略提供必要的指导。由于微控制器内硬件断点的数量有限，我们将它们仅设置为程序代码块的子集，并定期重新设置它们。由于许多调试探针都可以通过GNU调试器(GDB)寻址，因此我们在名为GDBFuzz的模糊器中实现了上述策略，它可以利用任何系统中的GDB接口，系统地生成由覆盖率指导的测试输入。所需的设置如图1所示。</p>
+<p><img src="/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231127150817020.png" srcset="/img/loading.gif" lazyload></p>
+<p>图2总结了GDBFuzz操作。基于目标程序的CFG, GDBFuzz将可用的硬件断点设置为从CFG中随机选择的尚未到达的节点。然后GDBFuzz重复生成输入，将其发送到目标设备，并检查它是否触发了指示新代码覆盖的断点，或者是否使目标系统崩溃。</p>
+<p><img src="/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231127150916538.png" srcset="/img/loading.gif" lazyload></p>
+<p>在我们的实验中，GDBFuzz显示很容易适用于许多微控制器板甚至普通用户应用程序。它实现了比黑盒模糊测试和基于虚拟化的解决方案更高的覆盖率，并且还检测了许多已知的和新的错误。总而言之，据我们所知，GDBFuzz是第一个基于硬件的、与架构无关的、源代码独立的、非侵入性的、易于应用的方法，用于覆盖引导的嵌入式系统模糊测试，我们很高兴向任何想要系统地测试嵌入式系统健壮性的人推荐它。</p>
+<p>本文的其余部分组织如下。第2节讨论了技术的现状。第3节解释CFG算法和二进制文件的CFG提取。第4节介绍了GDBFuzz的设计;第5节描述了实现细节。我们在第6节评估我们的工作，并在第7节进一步讨论结果。第8节以结论和今后的工作结束。GDBFuzz是开源的。</p>
+<h2 id="2-背景"><a href="#2-背景" class="headerlink" title="2.背景"></a>2.背景</h2><h3 id="2-1-覆盖率引导的模糊测试"><a href="#2-1-覆盖率引导的模糊测试" class="headerlink" title="2.1 覆盖率引导的模糊测试"></a>2.1 覆盖率引导的模糊测试</h3><p>几十年前，Miller等[37]用随机数据测试Unix命令行工具，观察到软件bug导致的崩溃，并将这种方法称为“模糊测试”(fuzzing)。根据设计，模糊测试只能检测实际执行的代码中的错误，这就是为什么需要达到高代码覆盖率的原因。目前，已经开发了大量不同的模糊测试技术，主要分为基于模型的模糊测试和基于突变的模糊测试，前者是根据输入语言的规范生成测试数据，后者是程序的已知输入随机突变。基于突变的模糊测试很有吸引力，因为目标程序只需要很少的样本输入(种子)。种子最初被添加到基本输入(语料库)的集合中，从中生成突变的测试输入。当将触发目标先前未见行为的测试输入添加到语料库中时，基于突变的模糊测试特别有效，称为反馈驱动模糊测试。对于覆盖率引导的模糊测试，新代码路径或代码块的执行被认为是以前未见过的行为。</p>
+<p>考虑清单1中process_data函数的代码，当输入的前四个字符匹配“bug!”且长度大于20时，该函数会导致堆栈溢出。当黑盒模糊器需要一次从28 * 4 &#x3D; 2 32个组合中正确猜出前四个字符时，覆盖引导的模糊器可以在每个比较步骤中分别与28个可能的组合进行比较，从而增加了在模糊测试期间产生触发堆栈溢出的输入的总体概率。</p>
+<p><img src="/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231127151507843.png" srcset="/img/loading.gif" lazyload></p>
+<p>典型的用户程序是通过利用源代码工具进行模糊测试的，这样代码覆盖率就会通过额外插入的代码反馈给模糊测试器。另外，当没有源代码时，模拟器用于获取代码覆盖率反馈，因此在编译时没有可用的代码插装。</p>
+<h3 id="2-2-嵌入式系统的覆盖率引导的模糊测试"><a href="#2-2-嵌入式系统的覆盖率引导的模糊测试" class="headerlink" title="2.2 嵌入式系统的覆盖率引导的模糊测试"></a>2.2 嵌入式系统的覆盖率引导的模糊测试</h3><p>许多方法使用仿真对嵌入式系统进行模糊测试。模拟器允许目标执行的高透明度。从模拟器中收集代码覆盖率是微不足道的，并且可以很容易地扩展模拟器中的模糊测试。然而，将嵌入式软件重新托管到模拟器中是几十年来一个开放的研究问题[17,58]。虽然模拟微处理器及其指令集是可行的，但模拟硬件外设的确切行为仍然具有挑战性。如果没有精确地模拟硬件外设，那么模拟的执行可能与实际硬件上的执行不一致，甚至完全失败。</p>
+<p>已经提出了几种方法来解决重新托管问题。HALucinator[8]基于HAL功能在某种程度上与设备无关的观察，在硬件抽象层(HAL)重新托管嵌入式应用程序。直接访问硬件的代码(如驱动程序)不能用这种方式进行测试，并且该方法需要手动编写所有硬件访问函数的替换。Avatar2[38]通过调试接口将所有I&#x2F;O请求从模拟器转发到实际的硬件设备，称为外设代理。在模拟器和实际设备之间传输数据会导致高达80倍的执行速度减慢[39]，并且需要特定于设备的设置。</p>
+<p>最近，Feng等人[18]与他们的工具P2IM一起提出了外设建模，其中模糊器用于迭代地对硬件外设建模。他们的想法是首先从fuzzer获取输入数据，然后在模拟器中执行嵌入式应用程序。对于每次在I&#x2F;O地址空间上发生的读取，都会应答一部分模糊测试数据，直到执行卡住或输入缓冲区耗尽。因此，fuzzer了解哪些值对于固件的进一步执行是必需的，因为它随后实现了更多的代码覆盖。Jetset[28]、µEmu[60]和Fuzzware[46]采用并完善了这一理念。尽管外围建模方法被认为是开箱即用的，但尚不清楚这些发现的可转移性如何。根据我们的经验，像USB这样更复杂的输入接口会给外设建模带来巨大的问题，正如我们在评估中所示。</p>
+<p>其他基于硬件的覆盖引导模糊测试方法仅适用于特定设置。Harzer Roller[4]将函数跟踪和堆栈粉碎（smashing）检测注入到闭源目标文件中。然而，这缺乏细粒度的代码覆盖，并且再次需要更改程序代码的能力。Boersig等人[7]使用源代码检测，并通过调试接口传输数据。同样，这需要能够更改程序代码，并且仅适用于ESP32微控制器。最后，µAFL[31]使用ARM的跟踪机制Embedded Trace Macrocell (ETM)[54]和兼容的跟踪硬件。然而，这样的跟踪硬件是昂贵的，而且很少可用。</p>
+<h3 id="2-3-调试器和断点"><a href="#2-3-调试器和断点" class="headerlink" title="2.3 调试器和断点"></a>2.3 调试器和断点</h3><p>调试器是观察程序执行的常用工具，特别是用于理解意外的程序行为。一种流行的用户程序调试器是GDB[33]。它允许在期望的点上停止目标程序的执行，检查内存值，以及单步执行代码。微控制器具有不同类型的调试接口，例如联合测试行动组(JTAG)端口。使用这样的端口，调试探针可以直接访问硬件。调试探针可以实现GDB远程存根，这样GDB就可以通过GDB远程串行协议执行调试操作[21]。通常，GDB运行在程序员的PC上，该PC承载着开发环境和应用程序的源文件。根据我们的观察，GDB远程存根是由大多数可用的板上和板外微控制器调试器实现的[35]，例如来自Segger[47]，STMicroelectronics[49]或Lauterbach[30]。因此，它可以作为深入了解嵌入式系统执行情况的通用方法。</p>
+<p>商业设备上的调试接口一般是关闭或禁用的，以防止攻击。然而，过去已经多次证明，使用故障注入攻击(如电源或时钟故障)可以重新打开禁用的调试接口[29,48]。此外，来自商用设备的固件可以传输到具有可访问调试接口的等效开发板，从而启用调试。</p>
+<p>调试器使用断点在需要的位置停止执行[57]。软件断点是通过用一个不同的指令字替换软件二进制中的原始指令来实现的，该指令字在执行时触发中断。在恢复执行时，调试器重新插入原始指令。因此，软件断点需要重写目标程序的一小部分。</p>
+<p>连续重写内存需要时间，并且会损耗设备的(闪存)内存。如果程序存储在只读存储器中，则不可能进行这种重写。因此，微控制器通常具有许多硬件断点。硬件断点对应于微处理器上的实际寄存器，一旦激活，当程序计数器值等于其寄存器值时中断程序执行。因此，可以将硬件断点设置为任何程序地址，而不管相应代码存储在哪种内存类型中。</p>
+<p>有一些方法使用软件断点来测量代码覆盖率并获得模糊反馈，以避免源代码插桩的开销和障碍[25,40,41]。其思想是将软件断点插入到未到达的基本块中，从而允许程序以全速执行，直到到达新的覆盖范围。一旦执行遇到断点，相应的指令将从二进制文件中删除，以避免进一步的开销。Oh等人[44]使用软件断点来测量嵌入式固件中的代码覆盖率。它们在编译过程中提取程序的每个基本块的起始地址，并在每个地方插入软件断点，一旦遇到断点也将其删除。</p>
+<h2 id="3-控制流程图"><a href="#3-控制流程图" class="headerlink" title="3.控制流程图"></a>3.控制流程图</h2><p>由于我们希望利用硬件断点进行模糊反馈，我们首先需要确定目标程序驻留在哪个内存地址。简单地说，可以考虑设备可执行内存区域内的所有地址。然而，只有一小部分内存地址包含实际执行的指令，使得简单的解决方案对模糊反馈无效。因此，与最先进的覆盖率引导的模糊器类似，我们在目标程序的基本块级别上工作。此外，我们从目标程序中提取了一个控制流图(CFG)，它将基本块表示为节点，并将它们之间可能的过渡描述为边。正如我们在本节的其余部分中所展示的那样，这使我们能够推导出CFG的支配关系，这有助于我们减少模糊测试期间断点中断的数量，并避免不必要的开销。</p>
+<h3 id="3-1-控制流图的支配子关系"><a href="#3-1-控制流图的支配子关系" class="headerlink" title="3.1 控制流图的支配子关系"></a>3.1 控制流图的支配子关系</h3><p>支配关系进一步描述了控制流图中节点之间的一致性。我们使用Agrawal[1]中的前后支配（pre- and postdominator）概念，并假设控制流图G恰好有一个入口点(entry point)和一个出口点(exit point)。</p>
+<p>定义1（Predomination）。一个节点$u\in G$ 前向支配（predominates）另一个节点$v \in G$，表示为$u \xrightarrow{pre} v$，如果每一条从入口节点（entry note）到$v$的路径都包含$u$。</p>
+<p>定义2（Postdomination）。一个节点$w \in G$ 后向支配（postdominates）另一个节点$v \in G$，表示为$w \xrightarrow{post} v$，如果每一条从$v$到退出节点（exit note）的的路径都包含$u$。</p>
+<p>支配子关系可以表示为支配子树，并且对于函数可以有效地计算[9]。后支配树等于反向控制流图[1]中的前支配树。从任意前、后支配子树，我们可以得到关于其他节点的传递知识:</p>
+<p>定理1(可达性)。如果节点v是可达的，所有在前支配树中的所有父节点先前已经被到达，并且所有后支配树种的父节点之后将被到达。</p>
+<h3 id="3-2-过程间控制流程图和支配子关系"><a href="#3-2-过程间控制流程图和支配子关系" class="headerlink" title="3.2 过程间控制流程图和支配子关系"></a>3.2 过程间控制流程图和支配子关系</h3><p>过程间控制流程图描述了整个程序中基本块的可能转换，而不仅仅是函数。原则上，我们可以通过添加所有调用和返回指令作为边来连接程序中每个函数的控制流图(local CFG)。但是，当函数有多个调用者时，这会引入歧义，因为它创建了从每个调用函数到每个返回点的路径。当遍历生成的过程间控制流图以计算支配图时，返回边必须只指向当前函数的实际调用位置，这需要上下文敏感算法[2,10]。已发布的上下文敏感算法很复杂，而且实现很少可用。GDBFuzz使用支配关系来减少开销，因此我们开发了以下简单的方法。</p>
+<p>我们构造了一个半过程间控制流图，其中我们通过将所有调用作为从调用点到被调用方的边插入来连接函数控制流图。在构建半程序间CFG时省略了返回边，因此不会引入错误的流。</p>
+<p>对于反转的半过程间控制流图，我们反转local CFG，跳过调用边，只添加返回边。同样，我们通过移除上下文敏感的调用边来避免插入歧义。利用局部控制流图算法，可以有效地计算出相应的半过程间支配树。与完整的过程间支配图相比，在最坏的情况下，我们可能会错过每个调用边缘的一个支配关系，这应该不会真正损害模糊性能。</p>
+<p>为方便起见，我们合并前后支配图:${(u,v)|u \xrightarrow{pre} v \vee u post \xrightarrow{post} v}$，要求我们只处理整个目标程序的一个主图。</p>
+<h2 id="4-设计"><a href="#4-设计" class="headerlink" title="4.设计"></a>4.设计</h2><p>如图2所示，GDBFuzz利用目标程序的控制流图将可用的硬件断点设置为随机选择的尚未到达的基本块。然后，它通过对语料库中随机选择的输入应用突变来重复地生成测试用例，并将测试用例发送到目标输入接口。如果调试探针发出命中断点的信号，GDBFuzz将相应节点及其主导节点标记为已到达，并将负责的测试用例添加到语料库中。导致崩溃或超时的测试用例被单独保存。如果在预定义数量的运行测试用例之后没有发生断点中断，GDBFuzz将硬件断点重新定位到新选择的节点。每次重新定位之后，GDBFuzz首先再次测试语料库中的所有输入，以检查它们是否已经到达了新的目标基本块。与使用完整代码插装的覆盖引导模糊测试一样，进化算法使输入语料库随着时间的推移而增长，输入到达不同的代码区域。</p>
+<p><img src="/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231127150916538.png" srcset="/img/loading.gif" lazyload></p>
+<p>本节的其余部分将介绍如何提取CFG，如何在目标应用程序中找到模糊测试入口点，以及如何在执行期间检测和处理错误。</p>
+<h3 id="4-1-提取控制流图"><a href="#4-1-提取控制流图" class="headerlink" title="4.1 提取控制流图"></a>4.1 提取控制流图</h3><p>由于编译器知道整个控制流程，所以在程序编译过程中可以很容易地得到控制流程图。然而，GDBFuzz设计用于二进制文件，以扩大其适用性，因为源代码可能不适用于嵌入式系统上的所有软件组件。Ghidra[42]是一个开源的逆向工程工具，它支持大多数常见的处理器架构，是可编写脚本的，因此非常适合我们的需求。像所有的二进制反汇编方法一样，Ghidra不能保证检测到所有的控制流，特别是当涉及到间接分支或激进的编译器优化时[45]。因此，我们在模糊过程中迭代地改进和更新控制流图，我们在第5节中描述。</p>
+<h3 id="4-2-寻找入口点"><a href="#4-2-寻找入口点" class="headerlink" title="4.2 寻找入口点"></a>4.2 寻找入口点</h3><p>我们将模糊测试集中在固件中的一个区域，在那里我们的目标输入接口的输入处理发生。因此，提取的CFG应该从输入处理的开始处开始，称为入口点。选择入口点是测试工程师的任务，因此他们需要了解目标。然而，下面这种半自动化的寻找合适入口点的方法在我们的分析中被证明是有用的。</p>
+<p>(1)向目标设备发送测试输入，并立即中断执行。</p>
+<p>(2)使用gdb find在设备内存中重新发现发送的输入。</p>
+<p>(3)将数据观察点设置为重新发现的输入数据的第一个地址。</p>
+<p>(4)重新发送测试输入。</p>
+<p>(5)当前发生中断上的所有程序计数器地址都是入口点的候选地址。</p>
+<p>这些步骤执行一次，作为GDBFuzz设置的一部分。</p>
+<p>GDBFuzz还可以使用包含在二进制文件中的符号名作为入口点，以避免每次重新编译后都需要搜索入口点。这在持续集成设置中特别有用，这样新的软件版本可以无缝地模糊化。</p>
+<h3 id="4-3-检测Bugs"><a href="#4-3-检测Bugs" class="headerlink" title="4.3 检测Bugs"></a>4.3 检测Bugs</h3><p>Bug oracle检测在执行过程中是否触发了一个Bug。由于模糊测试起源于测试用户应用程序，一个常见的错误预测是观察目标进程的错误信号，例如：分割的缺点。为了找到不直接触发错误的bug，使用了sanitizers和assertions。这些通常在编译时部署，但也有直接将杀毒器注入二进制文件的方法[11]。然而，更复杂的bug oracles仍然是一个开放的研究问题[5]，超出了本工作的范围。</p>
+<p>GDBFuzz依赖于被触发的错误是可观察的，这意味着错误或其他错误行为必须由错误触发。因此，除非在编译过程中使用额外的杀毒器，否则无法发现[39]中所演示的静默破坏。例如，可以通过发生连接错误(如超时或错误响应代码)来检测故障。此外，可以通过调试接口在故障处理程序的位置上设置断点，该接口还可以捕获来自已部署的sanitizers的故障信号。</p>
+<p>由于代码中错误处理程序的位置在运行期间通常不会改变，因此可以使用软件断点来检测它们的执行，这样所有硬件断点都可用于覆盖率反馈机制。软件断点非常适合这种情况，因为它们在模糊测试期间不会重新定位。如果软件断点对于被测系统(System under Test, SuT)是不可用的，那么可用的硬件断点子集也可以使用，缺点是模糊测试性能下降。</p>
+<p>获取故障处理程序的位置是通过手动或半自动化的方式完成的，因为嵌入式系统在特性上有很大的不同，比如处理器、操作系统、框架、库和sanitizers。根据我们的经验，默认的故障处理程序，例如来自freeRTOS [20]， Arduino[3]和STM32CubeMX[53]通常以无限循环结束。Ghidra可以识别具有无限循环的函数[43]，然后可以将其视为潜在的故障处理程序。对于我们所有的测试应用程序，依赖于由错误处理程序中的无限循环引起的超时就足够了，不需要为我们做任何进一步的设置工作。</p>
+<h3 id="4-4-处理Bugs"><a href="#4-4-处理Bugs" class="headerlink" title="4.4 处理Bugs"></a>4.4 处理Bugs</h3><p>每当GDBFuzz检测到崩溃或超时时，它就执行：</p>
+<p>(1)对该漏洞进行去重复，以确定该漏洞是否唯一，即该漏洞是否首次被发现;</p>
+<p>(2)保留触发该bug的输入，如果该bug是唯一的;</p>
+<p>(3)重启目标系统;</p>
+<p>(4)继续模糊化。</p>
+<p>在模糊测试期间，同一个bug可能被触发多次。分析每个bug需要大量的工作，这就是为什么需要重复数据删除。目标是为测试工程师提供一组只触发唯一错误的最小输入。我们使用调用堆栈的哈希值[34]来唯一地识别和删除错误。</p>
+<p>当bug被触发时，目标系统可能处于不可恢复状态。类似地，如果发生超时，目标系统可能永远挂起。因此，我们在发现故障后通过GDB重置目标系统。</p>
+<h2 id="5-实现"><a href="#5-实现" class="headerlink" title="5.实现"></a>5.实现</h2><p>GDBFuzz由以下组件组成:</p>
+<p><strong>测试数据生成器</strong>。与所有覆盖引导的模糊器一样，GDBFuzz保留触发输入语料库中不同代码区域的输入，并通过改变这些输入来派生新的输入。近年来，已经发表了数十种基于突变的通用fuzzers[34]。因此，我们不需要从头开始开发突变算法，而是重用libFuzzer[32]中的突变引擎。GDBFuzz中实际的突变引擎很容易互换。</p>
+<p><strong>GDB控制器</strong>。GDB控制器管理与SuT的调试连接。常见的调试探测通常通过TCP套接字提供GDB服务器。我们使用Python包python-gdb-mi来发送和接收调试命令，比如设置断点或继续执行。</p>
+<p><strong>目标连接</strong>。目标连接组件是一个抽象，用于向目标设备发送测试输入。它根据实际接口处理连接或断开事件。它还处理来自协议的错误反馈。嵌入式系统可以具有大量不同的输入接口和通道，这些输入来自不受信任的输入。流行的接口包括Wi-Fi，蓝牙，NFC，以及各种外部总线，如CAN, USB, Profibus或i2c。GDBFuzz可以包括自定义接口适配器，以实现广泛的适用性。对于我们的案例研究，我们实现了TCP、串行和USB连接的适配器，以及UNIX管道，以启用Linux应用程序的模糊测试。</p>
+<p><strong>Ghidra控制器</strong>。我们使用逆向工程工具Ghidra来获取目标应用程序的CFG。为了在Ghidra和GDBFuzz之间交换请求和数据，我们使用ghidra-bridge Python包。GDBFuzz可以连接到正在运行的Ghidra实例，也可以在目标二进制文件上启动一个无头实例。</p>
+<p><strong>动态控制流图细化</strong>。如前所述，逆向工程工具不能保证检测到程序的整个控制流程[45]。丢失的控制流表现为CFG中没有继任者的悬空节点，没有被Ghidra标记为terminal。当找到触发这种悬空节点执行的测试输入时，我们执行以下步骤:</p>
+<p>(1)为悬空节点设置断点，并将触发它的测试输入发送到SuT。</p>
+<p>(2)当中断发生时，执行单个步骤。</p>
+<p>(3)读取程序计数器的值。</p>
+<p>(4)将发现的边缘报告给Ghidra并重新分析二进制文件。然后，Ghidra通常能够根据报告的边缘恢复更多的控制流。</p>
+<h2 id="6-评估"><a href="#6-评估" class="headerlink" title="6.评估"></a>6.评估</h2><p>在本节中，我们以八个研究问题(RQs)为指导，在两种不同的设置下评估GDBFuzz。</p>
+<p>（1）对于基于硬件的设置，我们选择了各种常见的开发板，如表1所示，以及它们相应的体系结构、利用的调试探测和可用硬件断点的数量。在每个开发板上，我们部署四种不同类型的应用程序，如表2所示，具有初始给定的种子。Buggy程序将清单1中的buggy函数公开给串行输入接口，并作为基本事实。每个板的特定应用程序都来自开发板附带的示例，或者兼容的工具链。HTTP和USB应用程序类需要在目标板上存在适当的接口。</p>
+<p><img src="/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231127205108210.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231127205118738.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231127151507843.png" srcset="/img/loading.gif" lazyload></p>
+<p>(2)基于应用程序的设置采用来自Google的Fuzzer Test Suite[24]中的16个程序，编译为x86 linux应用程序，提供可扩展且可独立测量的评估环境。GDBFuzz既可以在QEMU实例中执行应用程序，支持实时测量已达到的代码覆盖率，也可以直接使用GDB执行应用程序，支持低开销和无限量的断点。我们使用编译器优化(-O3)编译应用程序，并在具有4个Intel Xeon Gold 6144 CPU和1.48TB RAM的服务器上执行相应的实验。</p>
+<h3 id="6-1-GDBFuzz-vs-Blackbox-Fuzzing"><a href="#6-1-GDBFuzz-vs-Blackbox-Fuzzing" class="headerlink" title="6.1 GDBFuzz vs. Blackbox Fuzzing"></a>6.1 GDBFuzz vs. Blackbox Fuzzing</h3><p>GDBFuzz可以在几乎不可能进行覆盖度量的系统上实现覆盖引导的模糊测试。因此，我们利用GDBFuzz本身的部分覆盖率提取机制，在我们基于硬件的设置中测量GDBFuzz和黑盒模糊之间的覆盖差异。具体来说，我们部署了GDBFuzz，但忽略了在模糊测试期间向语料库添加新输入来模拟黑箱模糊测试。因此，我们可以研究GDBFuzz的进化模糊算法是如何执行的，从而可以解决我们的第一个研究问题：</p>
+<p>RQ1: GDBFuzz与嵌入式系统上的黑盒模糊测试相比如何?</p>
+<p>图3显示了所有电路板和应用程序类组合的覆盖率随时间变化的图。每个实验重复2次，累计实验时间为56天。无一例外，GDBFuzz在所有运行中实现了比黑盒模糊测试更高的代码覆盖率，并且表明它可以从通过硬件断点检索的部分覆盖率信息中获得极大的好处。特别是对于Buggy程序，黑盒模糊测试几乎没有机会满足触发所包含的堆栈溢出错误的所有条件，如2.1节中理论上描述的那样。在这个应用类中，GDBFuzz在功能强大的CY8CKIT板上实现了每秒近100次迭代，而在性能较低的MSP430板上只能达到每秒约1.5次迭代。这就解释了为什么GDBFuzz需要更长的时间来解决后者的输入约束，我们也可以看到吞吐量对于模糊测试是多么重要。尽管如此，GDBFuzz在我们所有的开发板上都表现良好，在所有情况下都能找到错误，并正确报告导致的崩溃。</p>
+<p><img src="/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231128085643321.png" srcset="/img/loading.gif" lazyload></p>
+<blockquote>
+<p>&#x3D;&#x3D;&gt;在嵌入式系统中，具有有限断点的覆盖引导模糊测试是有效的，并且优于黑盒模糊测试。</p>
+</blockquote>
+<h3 id="6-2-GDBFuzz-vs-最先进的"><a href="#6-2-GDBFuzz-vs-最先进的" class="headerlink" title="6.2 GDBFuzz vs. 最先进的"></a>6.2 GDBFuzz vs. 最先进的</h3><p>如2.2节所述，有多种方法声称可以为嵌入式系统启用覆盖引导的模糊测试，这提出了以下问题：</p>
+<p>RQ2: GDBFuzz与现有的嵌入式模糊测试方法相比如何?</p>
+<p>µAFL[31]是一种基于硬件的嵌入式模糊器，它使用ARM ETM接口从嵌入式程序中提取代码覆盖率。我们的CY8CKIT-062-WIFI-BT开发板具有这样一个ETM接口，因此我们可以访问所需的跟踪硬件。然而，µAFL的公开版本在我们的设置上报告了令人难以置信的结果，尽管有供应商支持，我们仍无法解决。我们注意到µAFL使用原始跟踪数据函数，这在某些实现中是不可靠的，并且标记为仅供内部使用[22]。此外，与GDBFuzz相比，µAFL需要非常特定的硬件，这就是为什么它不是直接竞争对手;我们不知道有什么通用的基于硬件的嵌入式模糊测试方法来比较GDBFuzz。</p>
+<p>大多数已发布的嵌入式模糊测试方法都是基于仿真的，只有外围建模方法才能在一定规模上为嵌入式系统启用覆盖引导的模糊测试，并且是GDBFuzz的竞争对手。因此，我们将GDBFuzz与最新的外围建模方法Fuzzware进行比较[46]，后者的作者声称在实际硬件上进行嵌入式模糊测试是不切实际的。Fuzzware适用于所有基于ARM Cortex-M的微控制器，因此我们可以对表1中的前两个开发板中的所有应用程序进行模糊处理。</p>
+<p>首先，我们需要就如何比较基于仿真和基于硬件的方法达成一致。Li等人[31]通过每小时实现的模糊迭代次数，将外围建模方法与基于硬件的方法µAFL进行了比较。我们同意每次执行的次数是模糊测试的一个重要指标。但是，为了进行公平的比较，必须在同一时间内执行相同或至少相似的代码区域。外围设备建模方法，如p2im[18]和Fuzzware[46]使用模糊测试迭代地为固件创建一个人工执行环境。随着时间的推移，外设模型会得到改进，执行速度会下降，因为固件可以进一步执行。通过设计，外围建模不针对特定的代码区域。这使得吞吐量成为比较这些不同方法的无意义度量，因为不清楚在这段时间内是否执行了相同的代码部分。</p>
+<p>因此，我们根据模糊测试期间固件目标区域中达到的基本块的数量来比较嵌入式模糊测试方法，如[46]中所做的那样。</p>
+<p>基于仿真的方法可以通过使用多核轻松扩展，而基于硬件的方法则更加复杂和昂贵。为了让Fuzzware从其可扩展性中获益，我们为每个试验分配16个内核，而GDBFuzz作为单个实例运行相同的时间。然后，我们评估Fuzzware和GDBFuzz从目标区域到达了多少基本块。</p>
+<p>表3列出了使用Fuzzware和GDBFuzz达到的基本块的绝对数量和相对数量。虽然它提供了更强大的计算能力，但Fuzzware在8个应用程序中有6个没有达到任何基本阻塞，而GDBFuzz覆盖了其中的大部分。在剩下的两个应用程序中，GDBFuzz比Fuzzware达到了更多的基本块。STM32板上的USB控制器通过直接内存访问(DMA)传输数据，这是Fuzzware不支持的，但需要执行应用程序。从我们的经验来看，DMA是一种广泛用于与硬件外设交互的机制，而Fuzzware缺乏DMA支持是一个主要缺点。STM32板上的WiFi和传输控制协议(TCP)协议处理在通过串行外设接口(SPI)连接到微控制器的单独芯片中进行。为了触发HTTP解析器的执行，Fuzzware需要正确地建模芯片间通信协议，但它没有。</p>
+<p><img src="/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231128090947291.png" srcset="/img/loading.gif" lazyload></p>
+<p>在CY8CKIT板上，Fuzzware不能执行任何应用程序，因为CY8CKIT开发板的启动阶段需要两个包含的处理器之间的交互，这是Fuzzware无法建模的。</p>
+<p>对于具有DMA和复杂引导例程的复杂嵌入式程序，更多的计算能力将无法使Fuzzware到达目标代码。一般来说，目标输入接口越复杂，外围建模方法就越难以提供合理的模糊数据。</p>
+<blockquote>
+<p>&#x3D;&#x3D;&gt;GDBFuzz在嵌入式系统上模糊软件，而不需要任何插桩或其他软件更改。</p>
+</blockquote>
+<h3 id="6-3-使用GDBFuzz揭示Bug"><a href="#6-3-使用GDBFuzz揭示Bug" class="headerlink" title="6.3 使用GDBFuzz揭示Bug"></a>6.3 使用GDBFuzz揭示Bug</h3><p>模糊测试的主要目标是找到软件漏洞，这就导致了以下问题：</p>
+<p>RQ3:该方法能否揭示嵌入式软件代码中的实际bug?</p>
+<p>为了回答RQ3，我们首先来看两个已知的现实世界的bug。STM32CubeL4 USB中间件的USB枚举处理[51]包含使用µAFL发现的已知漏洞CVE-202134259和CVE-2021-34268[31]。我们验证GDBFuzz可以检测到这些真实世界的漏洞，并使用基于STM32CubeL4[52]中USB主机大容量存储设备类(MSC)示例应用程序版本1.17.1的固件。STM32微控制器在这个MSC应用程序中充当USB主机。因此，我们的设置与µAFL作者的设置相似。为了生成USB流量，我们将一个普通的USB闪存驱动器作为USB客户端插入USB端口。然后，我们在USB枚举的特定阶段引入模糊控制，在USB主机处理此数据之前，我们用模糊数据替换USB数据帧。也就是说，在对模糊数据进行任何解析之前，我们替换由客户端设备发送的原始设备描述符或设备配置。引入的模糊控制装置通过串行接口接收来自GDBFuzz的模糊数据。上述两种CVE在触发时都显示为超时，因为USB主机中间件被畸形的设备描述符或设备配置USB数据包错误地配置。基本上，它们是由缺少对来自USB客户端的不可信数据的有效性检查引起的。使用GDBFuzz和适当的模糊控制，在我们的实验中，两个CVE在不到5分钟的时间内被触发和检测。</p>
+<p>在评估期间，我们发现了三个以前未知的错误，我们向相应的供应商报告:</p>
+<p>(1) STM32 USB设备堆栈中的无限循环，由将uint8_t索引变量计数到for循环中的攻击者可控制的uint32_t变量引起[13]。</p>
+<p>(2) Cypress JSON解析器中的缓冲区溢出，由于缺少对固定大小的内部缓冲区的长度检查[12]。</p>
+<p>(3) Cypress JSON解析器中的空指针解引用，这是由于缺少验证检查造成的[14]。</p>
+<blockquote>
+<p>&#x3D;&#x3D;&gt;GDBFuzz揭示了嵌入式软件中的真正漏洞。</p>
+</blockquote>
+<h3 id="6-4-GDBFuzz-vs-AFL"><a href="#6-4-GDBFuzz-vs-AFL" class="headerlink" title="6.4 GDBFuzz vs. AFL++"></a>6.4 GDBFuzz vs. AFL++</h3><p>基于应用程序的设置允许我们使用GDBFuzz模糊Linux应用程序，这就提出了研究问题:</p>
+<p>RQ4: GDBFuzz与最先进的fuzzer afl++相比如何？</p>
+<p>为了公平地比较GDBFuzz和afl++[19]，我们让它们使用QEMU模式对afl++ (-Q)和使用QEMU的GDBFuzz操作未插桩的二进制文件。由于afl++中包含的修改后的QEMU版本无法进行实时插桩，因此我们在模糊化后重播各自的输入语料库，并由此测量达到的基本块数量。我们将GDBFuzz配置为使用8个断点，这在实际微控制器中是一个实际的低断点数量。</p>
+<p>图4显示了GDBFuzz和afl++的覆盖率随时间的变化图。显然，随着时间的推移，afl++比GDBFuzz覆盖了更多的代码。afl++正是为这些类型的应用程序设计和优化的，并且可以从其详尽的代码插装中受益。然而，我们认为仅使用8个断点的GDBFuzz并不太遥远。在某些应用程序上，GDBFuzz甚至可以达到类似数量的基本块。我们还强调，在无法进行仿真和插桩的情况下，afl++会退回到黑盒模糊测试——这也是GDBFuzz的优势所在。</p>
+<p><img src="/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231128091927330.png" srcset="/img/loading.gif" lazyload></p>
+<blockquote>
+<p>&#x3D;&#x3D;&gt;如果能以很少的成本部署AFL，那就使用它;否则，将GDBFuzz视为潜在的要求较低的替代方案。</p>
+</blockquote>
+<h3 id="6-5-支配关系带来的提升"><a href="#6-5-支配关系带来的提升" class="headerlink" title="6.5 支配关系带来的提升"></a>6.5 支配关系带来的提升</h3><p>现在让我们评估GDBFuzz设计的特定元素。如第4节所述，GDBFuzz利用优势关系将多个基本块标记为单个断点中断所达到的，这导致了以下问题：</p>
+<p>RQ5: GDBFuzz从支配关系中获益多少?</p>
+<p>为了回答RQ5，我们分析了在之前的实验中断点中断的平均数量，以及到达的基本块的平均数量，见表4。</p>
+<p>在我们所有的实验中，每个断点中断平均导致3.15个标记的基本块，这意味着探测的基本块的数量减少了68.25%。这一比例优于[56]中高效代码插装算法的实验，作者在实验中仅将插装点的数量减少了34%至49%。GDBfuzz可能会进一步减少开销，因为我们额外使用了后优势关系和所描述的半程序间CFG。</p>
+<p><img src="/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231128092504692.png" srcset="/img/loading.gif" lazyload></p>
+<p>正如我们在“Precision”一栏中看到的，绝大多数主导基本块的标记都是正确的。错误标记的基本块可能源于错误的逆向工程控制流程。由于覆盖率引导模糊是一个随机过程，不依赖于100%正确的覆盖率数据，因此达到的精度大多超过99%就足够了。流行的模糊测试工具，如afl++，在哈希图中存储覆盖数据，并且在模糊测试期间由于哈希冲突而丢失一些覆盖。</p>
+<blockquote>
+<p>&#x3D;&#x3D;&gt;在我们的实验中，优势关系将所需的断点中断减少了三分之二以上。</p>
+</blockquote>
+<h3 id="6-6揭示控制流程"><a href="#6-6揭示控制流程" class="headerlink" title="6.6揭示控制流程"></a>6.6揭示控制流程</h3><p>GDBFuzz可以引导逆向工程工具揭示未检测到的控制流，正如我们在第5节中所描述的那样，我们通过以下问题进行调查：</p>
+<p>RQ6: GDBFuzz能在多大程度上帮助逆向工程工具揭示未被识别的控制流?</p>
+<p>我们通过比较Ghidra最初检测到的额外显示的基本块和边缘的平均相对数量来回答RQ6。由于目标是使用激活的编译器优化进行编译的，因此对于逆向工程工具来说，恢复控制流尤其困难。在表4中，我们可以看到，在我们的实验中，可以显示多达674.16%的额外基本块和708.61%的额外边缘。新发现的控制流数量越少，并不一定表明GDBFuzz的性能越低，而是表明Ghidra的逆向工程性能越好。</p>
+<blockquote>
+<p>&#x3D;&#x3D;&gt;GDBFuzz揭示在模糊过程中的逆向工程中未检测到的基本块和边缘。</p>
+</blockquote>
+<h3 id="6-7-可用断点数量"><a href="#6-7-可用断点数量" class="headerlink" title="6.7 可用断点数量"></a>6.7 可用断点数量</h3><p>可用断点的数量因不同的微控制器家族和模型而异，这就提出了以下问题：</p>
+<p>RQ7:可用断点的数量如何影响模糊测试性能?</p>
+<p>为了评估不同数量的断点对模糊测试性能的影响，我们直接使用GDB执行应用程序，并使用普通的软件断点进行反馈，因为随着断点数量的增加，QEMU不能很好地扩展。通过这种方式，我们可以在不影响执行时间的情况下获得任意数量的断点，并且可以估计它们的数量如何随时间影响已实现的覆盖率。为了回答RQ7，我们在基于应用程序的设置中执行GDBFuzz，使用从1到65536的指数增长的虚拟断点数量。具有代表性的是，图5显示了四个应用程序随着时间的推移所达到的基本块，平均为2次运行。</p>
+<p><img src="/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231128093009402.png" srcset="/img/loading.gif" lazyload></p>
+<p>不出所料，每次使用的断点越多，覆盖的代码块就越多。在我们的实验中，似乎将断点的数量增加一倍会产生模糊性能的线性改进。努力和收益之间的指数相关性在模糊测试研究领域很常见[6]。同样，我们的实验观察表明，随着时间的推移，利用的断点数量和覆盖率之间呈指数相关性。</p>
+<blockquote>
+<p>&#x3D;&#x3D;&gt;随着时间的推移，线性增加的覆盖率需要成倍增加的断点。</p>
+</blockquote>
+<h3 id="6-8-GDBFuzz-vs-黑盒模糊测试"><a href="#6-8-GDBFuzz-vs-黑盒模糊测试" class="headerlink" title="6.8 GDBFuzz vs. 黑盒模糊测试"></a>6.8 GDBFuzz vs. 黑盒模糊测试</h3><p>正如第6.4节所指出的，当没有一致的插桩机制可用时，afl++会退回到黑盒模糊测试。这激发了我们最后的研究问题:</p>
+<p>RQ8:在基于应用程序的设置上，GDBFuzz与黑盒模糊测试相比如何?</p>
+<p>为了比较GDBFuzz和黑盒模糊测试，我们使用QEMU在模糊测试过程中直接测量达到的基本块，因为黑盒模糊测试没有语料库可重放。</p>
+<p>图6显示了黑盒模糊、GDBFuzz和精简版本(GDBFuzzSimple)随时间变化的测量覆盖率，该版本没有使用第3节中描述的支配关系。这个带有独立代码覆盖率测量的更大规模基准测试证实了开发板的结果:</p>
+<p><img src="/2023/11/27/Paper/Fuzzing%20Embedded%20Systems%20Using%20Debug%20Interfaces/image-20231128093341585.png" srcset="/img/loading.gif" lazyload></p>
+<p>GDBFuzz在所有实验中都优于黑盒模糊。此外，我们可以看到，使用支配关系来获得传递性知识，可以在大多数目标应用程序上实现更多更快的代码覆盖。然而，即使是GDBFuzzSimple在所有实验中也大大优于黑盒模糊。</p>
+<blockquote>
+<p>&#x3D;&#x3D;&gt;在更大规模的基于应用程序的设置中，GDBFuzz也优于黑盒模糊测试。 </p>
+</blockquote>
+<h2 id="7-讨论"><a href="#7-讨论" class="headerlink" title="7.讨论"></a>7.讨论</h2><p>现在我们已经展示了GDBFuzz的工作效果，我们想讨论使用代码块覆盖率作为度量的设计选择，GDBFuzz的模糊测试在实践中是如何工作的，以及对评估实验有效性的威胁。</p>
+<h3 id="7-1-块和分支覆盖"><a href="#7-1-块和分支覆盖" class="headerlink" title="7.1 块和分支覆盖"></a>7.1 块和分支覆盖</h3><p>虽然大多数最先进的模糊器(如afl++[19]和libFuzzer[32])利用边缘覆盖，但我们使用块覆盖来指导进化模糊算法。用我们的方法提取边缘覆盖，将需要多次探测已经到达的块，这将大大增加开销。Nagy等[40]使用软件断点来检测正常软件的新基本块的执行情况。他们发现边缘覆盖不能从更细的粒度中受益，因为需要恒定的插桩开销。由于边缘检测会在我们的设置中引入比普通软件上的源代码检测更多的开销，我们将块覆盖率估计为GDBFuzz中唯一可行的覆盖度量。</p>
+<h3 id="7-2-模糊固件驱动程序"><a href="#7-2-模糊固件驱动程序" class="headerlink" title="7.2 模糊固件驱动程序"></a>7.2 模糊固件驱动程序</h3><p>模糊驱动程序，或嵌入式软件的中间件，可以通过向外部接口注入模糊数据的黑盒方法来实现，或者作为白盒方法，通过将模糊harness编译到固件中来获取模糊数据并将其重定向到驱动函数。白盒方法提供了更多的灵活性，因为可以直接调用驱动函数，并且可以将确认信号反馈给模糊器，这表明函数已正确返回。但是，要实现合适的模糊测试工具，需要对代码和系统有专业的了解。此外，实现的harness仅在不同的代码库上工作，并且可能产生误报，因为在达到测试的驱动程序功能之前，已经可以在硬件中对输入进行消毒[31]。µAFL显示，白盒方法适用于复制已知的CVE，因为错误的功能是已知的，并且原始发现者选择了相同的方法。</p>
+<p>黑盒方法通常需要较少的设置工作，因为到目标接口的数据路由应该存在于大多数测试设置中，因此测试工程师只需要通过实现合适的Python类将现有路由连接到GDBFuzz。因此，我们的连接适配器开箱即用，例如适用于所有现有的USB设备驱动程序。我们在GDBFuzz中发现的以前未知的错误，是在没有开发和使用广泛的利用功能的情况下触发的，而是在未更改的固件上。</p>
+<h3 id="7-3-有效性威胁"><a href="#7-3-有效性威胁" class="headerlink" title="7.3 有效性威胁"></a>7.3 有效性威胁</h3><p>实证研究必然充满了对有效性的威胁。为了解决外部有效性问题，我们在不同的开发板上使用不同的调试器和架构测试了该方法，并确保我们可以找到真实世界的错误。此外，我们对已知的fuzzer基准目标进行了更大的案例研究。为了最小化系统错误的风险和解决内部有效性怀疑，我们在评估期间将覆盖测量从我们的工具中分离出来，并将每个实验重复多次。GDBFuzz的实现是公开的，可以复制我们的结果(第9节)。</p>
+<h2 id="8-结论与未来工作"><a href="#8-结论与未来工作" class="headerlink" title="8.结论与未来工作"></a>8.结论与未来工作</h2><p>嵌入式模糊测试领域缺乏通用的、易于应用的、高效的解决方案。我们提出了一种调试器驱动的模糊测试方法，该方法仅依赖于微控制器上GDB兼容的调试探针和硬件断点的存在。因此，GDBFuzz可以在嵌入式系统上实现廉价的、非侵入性的、源代码不可知的覆盖指导的模糊测试。它旨在为各种微控制器和输入接口开箱即用。与之前的断言相反，我们证明了基于硬件的嵌入式模糊测试是实用的，可以揭示软件缺陷。由于模糊测试是在原始硬件上执行的，因此执行速度很快，而且自然准确。检测到的故障是真实的，可以很容易地复制。</p>
+<p>我们在四个具有四种不同微控制器的嵌入式应用程序类上评估了我们的实现GDBFuzz，表明它在所有情况下都击败了黑盒模糊测试和最新的基于仿真的方法Fuzzware。此外，我们在仿真环境中对常用的模糊器基准测试目标进行了GDBFuzz测试，以获得更多的实验数据和统计数据。我们展示了利用支配关系提高GDBFuzz的性能，并且已经有一个硬件断点足以启用覆盖引导的模糊测试。我们还展示了GDBFuzz可以揭示逆向工程工具在模糊测试期间遗漏的控制流。总而言之，如果嵌入式系统提供了调试器接口，GDBFuzz提供了实用的模糊测试解决方案。</p>
+<p>GDBFuzz的未来工作将集中在增强策略上，用于选择基本块进行探测，并结合已建立的模糊优化，如语料库最小化、字典或不同的种子调度。此外，有状态嵌入式系统的模糊测试是未来工作的一部分。</p>
+<h2 id="9-数据可用性"><a href="#9-数据可用性" class="headerlink" title="9.数据可用性"></a>9.数据可用性</h2><p>GDBFuzz的开源实现、评估设置和原始结果可从以下网站获得：<a target="_blank" rel="noopener" href="https://github.com/boschresearch/gdbfuzz">boschresearch&#x2F;gdbfuzz</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%BA%E6%96%87/" class="category-chain-item">论文</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91/" class="print-no-link">#论文翻译</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>论文：Fuzzing Embedded Systems Using Debug Interfaces</div>
+      <div>http://c0ngvv.github.io/2023/11/27/Paper/Fuzzing Embedded Systems Using Debug Interfaces/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>C0ngvv</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年11月27日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/11/25/%E6%9D%82%E8%AE%B0/Hexo%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E7%AE%80%E8%AE%B0/" title="Hexo静态博客搭建简记">
+                        <span class="hidden-mobile">Hexo静态博客搭建简记</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
